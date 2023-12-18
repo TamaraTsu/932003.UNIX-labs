@@ -1,9 +1,0 @@
-version: '3'
-services:
-  concurrent-container:
-    image: concurrent-file-manager
-    volumes:
-      - my_shared_volume:/my_shared_volume
-
-volumes:
-  my_shared_volume:
