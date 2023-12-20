@@ -11,3 +11,5 @@
 4.  docker run -it --rm -v megavolume:/data alpine ls /data
 
 5.  docker ps
+
+docker volume rm megavolume чтобы удалить том
