@@ -55,5 +55,5 @@ while true; do
         if [ -e "$directory/$next_filename" ]; then
             rm "$directory/$next_filename"
         fi
-    ) 200>$directory/synchronization_lock
+    ) 200<$directory/synchronization_lock
 done
