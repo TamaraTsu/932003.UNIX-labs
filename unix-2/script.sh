@@ -36,14 +36,14 @@ while true; do
             content="$next_filename : $container_identifier"
             echo "$content" >"$directory/$next_filename"
         fi
-    ) 200>"$flock_file"
+    ) 200>"$lock_file"
 
     sleep 1
 
     (
         flock -x 200
 
-        if [ -n "$next_filename"] && [ -e "$directory/$next_filename" ]; then
+        if [ -n "$next_filename" ] && [ -e "$directory/$next_filename" ]; then
             rm "$directory/$next_filename"
         fi
     ) 200<"$lock_file"
