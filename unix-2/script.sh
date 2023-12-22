@@ -1,6 +1,8 @@
-#!/bin/sh -e
+#!/bin/bash -e
 
-directory="/data" # Adjust this to your specific directory
+directory="/data"
+max_files=999
+lock_file="$directory/synchronization_lock"
 
 # Function to generate a random container identifier
 generate_random_identifier() {
@@ -12,17 +14,14 @@ generate_random_identifier() {
 
 # Function to find the next available file name in the directory
 find_next_available_name() {  
-    # Iterate from 1 to a maximum number (e.g., 999)
-    for i in $(seq -w 1 999); do
+    for i in $(seq -w 1 "$max_files"); do
         filename="$(printf "%03d" "$i")" # Format as "001," "002," etc.
-
         # Check if the file does not exist in the directory
         if [ ! -e "$directory/$filename" ]; then
             echo "$filename"
             return # Return the first available file name
         fi
     done
-
     # If all file names are occupied
     echo "No available file names"
 }
@@ -36,24 +35,21 @@ while true; do
         if [ ! -e "$directory/$next_filename" ]; then
             # Generate a random container identifier
             container_identifier=$(generate_random_identifier)
-
-            # Format the content as "001 : <identifier>"
             content="$next_filename : $container_identifier"
 
             echo "$content" >"$directory/$next_filename"
         fi
-    ) 200>$directory/synchronization_lock
+    ) 200>"$flock_file"
 
     sleep 1
-
     # Add an additional sleep to delay before next step
     sleep 1
 
     (
         flock -x 200
 
-        if [ -e "$directory/$next_filename" ]; then
+        if [ -n "$next_filename"] && [ -e "$directory/$next_filename" ]; then
             rm "$directory/$next_filename"
         fi
-    ) 200<$directory/synchronization_lock
+    ) 200<"$lock_file"
 done
